@@ -79,6 +79,79 @@
     }
 
     /* ==========================================
+       AŞAMA 1.5: HACKER ŞİFRE EKRANI
+    ========================================== */
+    #password-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #050505;
+      z-index: 9998;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .password-card {
+      background: #0a0a0a;
+      border: 1px solid #00ff66;
+      padding: 35px 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(0, 255, 102, 0.25);
+      text-align: center;
+      max-width: 380px;
+      width: 90%;
+    }
+
+    .password-card h2 {
+      color: #00ff66;
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+    }
+
+    .password-input {
+      background: #000;
+      border: 1px solid #00ff66;
+      color: #00ff66;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: 'Fira Code', monospace;
+      font-size: 1.1rem;
+      width: 100%;
+      text-align: center;
+      outline: none;
+      margin-bottom: 15px;
+    }
+
+    .password-btn {
+      background: #00ff66;
+      color: #000;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      width: 100%;
+      cursor: pointer;
+      font-family: 'Fira Code', monospace;
+      transition: 0.2s;
+    }
+
+    .password-btn:hover {
+      background: #00cc52;
+      box-shadow: 0 0 10px #00ff66;
+    }
+
+    #pass-error {
+      color: #ff3366;
+      font-size: 0.85rem;
+      margin-top: 10px;
+      display: none;
+    }
+
+    /* ==========================================
        ANA KONTEYNER VE PENCERE DÜZENİ
     ========================================== */
     .container {
@@ -102,6 +175,22 @@
 
     .hidden {
       display: none !important;
+    }
+
+    /* ==========================================
+       SOL ÜST SAAT
+    ========================================== */
+    #live-clock {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: #38bdf8;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
     }
 
     /* ==========================================
@@ -196,7 +285,7 @@
 
     /* Alt Taraf İçin Büyük İYİKİ DOĞDUN Yazısı */
     .birthday-text {
-      margin-top: 25px;
+      margin-top: 20px;
       font-size: 2.2rem;
       font-weight: 900;
       letter-spacing: 2px;
@@ -233,6 +322,17 @@
     <div id="terminal-content"></div><span class="cursor"></span>
   </div>
 
+  <!-- 1.5 AŞAMA: HACKER ŞİFRE PENCERESİ -->
+  <div id="password-overlay" class="hidden">
+    <div class="password-card">
+      <h2>> GÜVENLİK KONTROLÜ</h2>
+      <p style="color: #00ff66; font-size: 0.8rem; margin-bottom: 15px;">Erişim için parolayı girin:</p>
+      <input type="password" id="pass-input" class="password-input" placeholder="Şifre..." autofocus>
+      <button onclick="checkPassword()" class="password-btn">GİRİŞ YAP</button>
+      <div id="pass-error">> Hatalı Parola! Tekrar Dene.</div>
+    </div>
+  </div>
+
   <div class="container">
     
     <!-- 2. AŞAMA: KAÇAN BUTON PENCERESİ -->
@@ -248,7 +348,10 @@
 
     <!-- 3. AŞAMA: KAZI KAZAN PENCERESİ -->
     <div id="stage-3" class="window-card hidden">
-      <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.3);">
+      <!-- SOL ÜST GERÇEK ZAMANLI SAAT -->
+      <div id="live-clock">00:00:00</div>
+
+      <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.3); margin-top: 15px;">
         Son Aşama ✨
       </span>
       <h1>Sürpriz Kartı Kazı!</h1>
@@ -282,7 +385,7 @@
       "> Checking age status...",
       "> WARNING: Age limit exceeded! (+1 Year)",
       "> Bypassing security firewalls...",
-      "> ACCESS GRANTED! Launching surprise mode..."
+      "> ACCESS GRANTED! Passcode required..."
     ];
 
     let lineIndex = 0;
@@ -304,15 +407,36 @@
       } else {
         setTimeout(() => {
           document.getElementById('terminal-overlay').style.display = 'none';
-          document.getElementById('stage-2').classList.remove('hidden');
-        }, 1000);
+          document.getElementById('password-overlay').classList.remove('hidden');
+        }, 800);
       }
     }
 
     window.onload = () => {
       typeLine();
-      initScratchCard();
     };
+
+    /* ==========================================
+       1.5 ŞİFRE MANTIĞI
+    ========================================== */
+    function checkPassword() {
+      const input = document.getElementById('pass-input').value.trim().toLowerCase();
+      const errorMsg = document.getElementById('pass-error');
+      
+      if (input === 'cano') {
+        document.getElementById('password-overlay').style.display = 'none';
+        document.getElementById('stage-2').classList.remove('hidden');
+      } else {
+        errorMsg.style.display = 'block';
+      }
+    }
+
+    // Enter tuşuna basınca şifre kontrolü yap
+    document.getElementById('pass-input').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        checkPassword();
+      }
+    });
 
     /* ==========================================
        2. KAÇAN BUTON MANTIĞI
@@ -348,10 +472,28 @@
     });
 
     function handleEvasiveClick() {
+      // 5 kez kaçtıktan sonra geçiş izni ver
       if (escapeCount >= 5) {
         document.getElementById('stage-2').classList.add('hidden');
         document.getElementById('stage-3').classList.remove('hidden');
+        initScratchCard();
+        startClock();
       }
+    }
+
+    /* ==========================================
+       CANLI SAAT MANTIĞI
+    ========================================== */
+    function startClock() {
+      function updateClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('live-clock').innerText = `${hours}:${minutes}:${seconds}`;
+      }
+      updateClock();
+      setInterval(updateClock, 1000);
     }
 
     /* ==========================================
@@ -363,11 +505,9 @@
       const canvas = document.getElementById('scratch-canvas');
       const ctx = canvas.getContext('2d');
 
-      // Gri Kaplama Çiz
       ctx.fillStyle = '#64748b';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Üzerine Yazı Ekle
       ctx.fillStyle = '#94a3b8';
       ctx.font = 'bold 18px Poppins';
       ctx.textAlign = 'center';
@@ -390,7 +530,6 @@
         checkScratchPercentage();
       }
 
-      // Event Listeners (Mouse & Dokunmatik)
       canvas.addEventListener('mousedown', () => isDrawing = true);
       canvas.addEventListener('mouseup', () => isDrawing = false);
       canvas.addEventListener('mousemove', scratch);
@@ -400,7 +539,6 @@
       canvas.addEventListener('touchmove', scratch);
     }
 
-    // Kazınma Yüzdesini Hesapla
     function checkScratchPercentage() {
       if (isConfettiFired) return;
 
@@ -415,7 +553,6 @@
 
       const percentage = (clearPixels / (imageData.data.length / 4)) * 100;
 
-      // %40'ı kazındığında konfetiyi patlat
       if (percentage > 40) {
         isConfettiFired = true;
         confetti({
@@ -428,4 +565,3 @@
   </script>
 </body>
 </html>
-
